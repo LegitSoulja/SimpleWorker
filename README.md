@@ -1,5 +1,5 @@
 # SimpleWorker
-Make JavaScript Workers easier, and friendly to use.
+Make JavaScript Workers easier, and friendly to use. **SimpleWorker** is not a workaround for DOM manipulations.
 
 ```js
 var worker = new SimpleWorker();

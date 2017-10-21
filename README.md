@@ -7,7 +7,9 @@ var worker = new SimpleWorker();
 var a = 5;
 var b = 50;
 
-var thread = function(a,b){ return a * b; };
+var thread = function(a,b){ 
+    return a * b; 
+};
 
 var pid = worker.prepare(thread, a, b);
 

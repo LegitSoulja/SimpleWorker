@@ -30,3 +30,14 @@ worker.execute(pid, function(e){
 // kill/destroy worker
 worker.kill(pid);
 ```
+
+##### Notes
+
+- A ```pid``` is a negative number associated with each worker thread. 
+- You cannot use SimpleWorker for DOM manipulations. All Worker rules applies.
+- SimpleWorker's worker cannot be shared with other workers
+
+##### Todo
+- Ability to load libraries inside a worker using ```importScript```
+
+

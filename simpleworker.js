@@ -32,7 +32,7 @@
             for (var i in arguments)
                 args.push(arguments[i])
             if (args.length > 1) args.shift();
-            var _export = {
+            this.workers[dth(pid)] = {
                 worker: new Worker(worker_handler),
                 args: args,
                 init: function (cb) {
@@ -45,7 +45,6 @@
                 },
                 func: func
             }
-            this.workers[dth(pid)] = _export;
             this.pid--;
             return pid;
         },

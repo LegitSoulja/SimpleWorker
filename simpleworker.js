@@ -79,8 +79,9 @@
                 this.workers[pid].worker.terminate();
         },
         killAll: function () {
-            for (var i in this.workers)
-                this.workers[i].worker.terminate();
+            var keys = Object.keys(this.workers);
+            for (var i in keys)
+                this.workers[keys[i]].worker.terminate();
         }
 
     }

@@ -18,7 +18,7 @@ worker.execute(pid, function(e){
 // you can even restore a worker without re-creating it
 worker.restore(pid, process, a, 100)
 
-// *Null will no overwrite your process
+// *Null will not overwrite your process
 // worker.restore(pid, null, a, 100); 
 
 worker.execute(pid, function(e){

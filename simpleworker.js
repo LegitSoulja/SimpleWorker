@@ -7,12 +7,11 @@
 (function (w, d) {
 
     var worker_handler = w.URL.createObjectURL(new Blob(['(',
-    function () {
-		self.onmessage = function (e) {
-			return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args)));
-		}
-    }.toString(),
-    ')()'], { type: "text/javascript" }));
+    	function () {
+				self.onmessage = function (e) {
+				return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args)));
+			}
+    }.toString(), ')()'], { type: "text/javascript" }));
 
     var dth = function(n) {
         if (n < 0) n = 0xFFFFFFFF + n + 1;

@@ -10,8 +10,9 @@
         function () {
             self.onmessage = function (e) {
             return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args)));
-        }
-    }.toString(), ')()'], { type: "text/javascript" }));
+            }
+        }.toString(), 
+    ')()'], { type: "text/javascript" }));
 
     var dth = function(n) {
         if (n < 0) n = 0xFFFFFFFF + n + 1;

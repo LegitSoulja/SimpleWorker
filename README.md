@@ -4,28 +4,51 @@ Make JavaScript Workers easier, and friendly to use.
 ```js
 var worker = new SimpleWorker();
 
-var a = 5;
-var b = 50;
+var x = 200;
+var y = 200;
 
-var thread = function(a,b){ 
-    return a * b; 
+// Your Thread (Function), that is passed to the worker to read
+var thread = function(x,y){ 
+  
+  var ix, iy, Vector2, map = [];
+  ix = iy = 0;
+  
+  Vector2 = function(x,y) {
+    this.x = x;
+    this.y = y;
+  }
+  
+  for(ix = 0; ix < x; ix++)
+    for(iy = 0; iy < y; iy++)
+        map.push(new Vector2(ix,iy));
+        
+  return map;
+  
 };
 
-var pid = worker.prepare(thread, a, b);
 
+// create your worker, with it's thread (Function), along with any agruments you need to pass with
+var pid = worker.prepare(thread, x, y);
+
+
+// execute your worker (async), get in return your responce. You MUST use a callback on execute, until another solution is found to properly handle a Promise.
 worker.execute(pid, function(e){
-  console.log(e); // 250
+  console.log(e.length); // 40,000
 });
 
-// you can even restore a worker without re-creating it
-worker.restore(pid, thread, a, 100)
 
-// *Null will not overwrite your thread
-// worker.restore(pid, null, a, 100); 
+// You can even restore a worker without making another. Pass back the thread, and arguments
+worker.restore(pid, thread, 500, 500)
+
+
+// Using Null will not overwrite your thread, but you can change arguments if needed aswell
+// worker.restore(pid, null, 500, 500); 
+
 
 worker.execute(pid, function(e){
-  console.log(e); // 500
+  console.log(e.length); // 250,000
 });
+
 
 // kill/destroy worker
 worker.kill(pid);
@@ -40,5 +63,8 @@ worker.kill(pid);
 ##### Todo
 - Ability to load libraries inside a worker using ```importScript```
 - More advanced stuff
+- Implement for/foreach threading, (Basically an implemented function within the worker), 
+> When using for/foreach threading you still use for/foreach in your thread function. It'll just be replaced with a function the Worker can read that'll run for/each in a new thread. **This may or moy not be a feature, but for testing purposes only**.
+
 
 

@@ -45,7 +45,7 @@ SimpleWorker.restore(pid, thread, 500, 500)
 
 
 // Using Null will not overwrite your thread, but you can change arguments if needed aswell
-// worker.restore(pid, null, 500, 500); 
+// SimpleWorker.restore(pid, null, 500, 500); 
 
 
 SimpleWorker.execute(pid, function(e){

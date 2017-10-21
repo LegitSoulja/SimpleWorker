@@ -15,7 +15,7 @@
                 return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args))); 
             }
         }.toString(), 
-    ')()'], { type: "text/javascript" }));
+    ')()'], { type: "application/javascript" }));
 
     var dth = function(n) {
         if(n > 0) n = -(Math.abs(n)); 
@@ -23,34 +23,36 @@
         return n.toString(16).toUpperCase();
     }
 	
+    var shiftN = function(args, n){
+        for(var i = 0; i < n; i++)
+            args.shift();
+        return args;
+    }
+	
     var SimpleWorker = function () {
         this.workers = {}
-        this.pid = -1;
     }
 	
     SimpleWorker.prototype = {
 
         prepare: function (func) {
-            var pid = this.pid;
+            if(typeof(func) !== 'function') 
+                throw new Error("Prepare must require a Thread(Function)");
+            var pid = -(Math.abs((Object.keys(this.workers).length) + 1));
             var args = [];
             if(arguments.length > 1) {
-                for (var i in arguments)
-                    args.push(arguments[i])
-                args.shift();
+                Array.prototype.push.apply(args, arguments);
+                args = shiftN(args, 1);
             }
             this.workers[dth(pid)] = {
-                pid: pid,
                 worker: new Worker(worker_handler),
                 args: args,
                 init: function (cb) {
                     if (this.worker.onmessage == null)
-                        this.worker.onmessage = function (e) {
-                            if (typeof (cb) === 'function')
-                                return cb(e.data);
-                        }
+                        this.worker.onmessage = function (e) { return cb(e.data); }
                     this.worker.postMessage({ func: (this.func).toString(), args: this.args });
                 },
-                func: func
+                func: func,
             }
             this.pid--;
             return pid;
@@ -62,10 +64,8 @@
                     this.workers[pid].func = func;
                 var args = [];
                 if (arguments.length > 2) {
-                    for (var i in arguments)
-                        args.push(arguments[i]);
-                    args.shift();
-                    args.shift();
+                    Array.prototype.push.apply(args, arguments)
+                    args = shiftN(args, 2);
                     this.workers[pid].args = args;
                 }
                 return;
@@ -77,7 +77,7 @@
             if (this.workers[pid] != null)
                 if(typeof(cb) === 'function')
                     this.workers[pid].init(function (e) { return cb(e); });
-                else throw new Error("Execute must require an async callback");
+                else throw new Error("Execute must require an async callback.");
             else throw new Error("Thread 0x" + pid + " does not exist.");	
         },
         kill: function (pid) {
@@ -87,7 +87,7 @@
                 delete this.workers[pid];
                 return;
             }
-            throw new Error("Could not find thread " + "0x" + pid)
+            throw new Error("Could not find thread " + "0x" + pid + ".")
         },
         killAll: function () {
             var keys = Object.keys(this.workers);
@@ -95,10 +95,13 @@
                 this.workers[keys[i]].worker.terminate();
                 delete this.workers[keys[i]];
             }
+        },
+        newInstance(){
+            return new SimpleWorker();
         }
 
     }
 
-    w.SimpleWorker = SimpleWorker;
+    w.SimpleWorker = new SimpleWorker();
 
 })(window, document);

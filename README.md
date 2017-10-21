@@ -39,5 +39,6 @@ worker.kill(pid);
 
 ##### Todo
 - Ability to load libraries inside a worker using ```importScript```
+- More advanced stuff
 
 

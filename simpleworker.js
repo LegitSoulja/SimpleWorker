@@ -8,8 +8,8 @@
 
     var worker_handler = w.URL.createObjectURL(new Blob(['(',
         function () {
-            self.onmessage = function (e) {
-            return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args)));
+            self.onmessage = function (e) { 
+                return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args))); 
             }
         }.toString(), 
     ')()'], { type: "text/javascript" }));

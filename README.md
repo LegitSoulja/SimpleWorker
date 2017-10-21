@@ -2,7 +2,10 @@
 Make JavaScript Workers easier, and friendly to use.
 
 ```js
-var worker = new SimpleWorker();
+// SimpleWorker is global in window, but you can create a new instance if needed for security
+// var worker = SimpleWorker.newInstance()
+
+/* global SimpleWorker */
 
 var x = 200;
 var y = 200;
@@ -28,30 +31,30 @@ var thread = function(x,y){
 
 
 // create your worker, with it's thread (Function), along with any agruments you need to pass with
-var pid = worker.prepare(thread, x, y);
+var pid = SimpleWorker.prepare(thread, x, y);
 
 
 // execute your worker (async), get in return your responce. You MUST use a callback on execute, until another solution is found to properly handle a Promise.
-worker.execute(pid, function(e){
+SimpleWorker.execute(pid, function(e){
   console.log(e.length); // 40,000
 });
 
 
 // You can even restore a worker without making another. Pass back the thread, and arguments
-worker.restore(pid, thread, 500, 500)
+SimpleWorker.restore(pid, thread, 500, 500)
 
 
 // Using Null will not overwrite your thread, but you can change arguments if needed aswell
 // worker.restore(pid, null, 500, 500); 
 
 
-worker.execute(pid, function(e){
+SimpleWorker.execute(pid, function(e){
   console.log(e.length); // 250,000
 });
 
 
 // kill/destroy worker
-worker.kill(pid);
+SimpleWorker.kill(pid);
 ```
 
 ##### Notes
@@ -61,9 +64,9 @@ worker.kill(pid);
 - SimpleWorker's worker cannot be shared with other workers
 
 ##### Todo
-- Ability to load libraries inside a worker using ```importScript```
-- More advanced stuff
-- Implement for/foreach threading, (Basically an implemented function within the worker), 
+- [ ] Ability to load libraries inside a worker using ```importScript```
+- [ ] More advanced stuff
+- [ ] Implement for/foreach threading, (Basically an implemented function within the worker), 
 > When using for/foreach threading you still use for/foreach in your thread function. It'll just be replaced with a function the Worker can read that'll run for/each in a new thread. **This may or moy not be a feature, but for testing purposes only**.
 
 

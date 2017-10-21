@@ -30,8 +30,16 @@ var thread = function(x,y){
 };
 
 
-// create your worker, with it's thread (Function), along with any agruments you need to pass with
+// Create your worker, with it's thread (Function), along with any agruments you need to pass with
 var pid = SimpleWorker.prepare(thread, x, y);
+
+
+// Import a script to use with your thread
+SimpleWorker.importScript(pid, "http://example.com/script.js");
+
+
+// Import multiple scripts
+SimpleWorker.importScript(pid, ["http://example.com/script.js", "http://example.com/script2.js"])
 
 
 // execute your worker (async), get in return your responce. You MUST use a callback on execute, until another solution is found to properly handle a Promise.
@@ -64,7 +72,7 @@ SimpleWorker.kill(pid);
 - SimpleWorker's worker cannot be shared with other workers
 
 ##### Todo
-- [ ] Ability to load libraries inside a worker using ```importScript```
+- [x] Ability to load libraries inside a worker using ```importScript```
 - [ ] More advanced stuff
 - [ ] Implement for/foreach threading, (Basically an implemented function within the worker), 
 > When using for/foreach threading you still use for/foreach in your thread function. It'll just be replaced with a function the Worker can read that'll run for/each in a new thread. **This may or moy not be a feature, but for testing purposes only**.

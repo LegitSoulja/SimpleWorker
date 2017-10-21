@@ -1,8 +1,6 @@
 # SimpleWorker
 Make workers easy
 
-var worker = new SimpleWorker();
-
 ```js
 var worker = new SimpleWorker();
 

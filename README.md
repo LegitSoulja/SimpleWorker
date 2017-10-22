@@ -70,7 +70,7 @@ SimpleWorker.kill(pid);
 ##### Notes
 
 - A ```pid``` is a negative number associated with each worker thread. 
-- You cannot use SimpleWorker for DOM manipulations. All Worker rules applies.
+- You cannot use SimpleWorker for DOM manipulations. (Check this out)[https://github.com/LegitSoulja/SimpleWorker/tree/v2]
 - SimpleWorker's worker cannot be shared with other workers
 
 ##### Todo

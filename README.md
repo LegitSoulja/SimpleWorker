@@ -1,5 +1,5 @@
 # SimpleWorker
-###### Size: 2.12KB
+###### Size: 1.83KB
 
 Make JavaScript Workers easier, and friendly to use.
 

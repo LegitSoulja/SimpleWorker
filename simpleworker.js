@@ -12,10 +12,6 @@
     var worker_handler = w.URL.createObjectURL(new Blob(['(',
         function () {
             self.onmessage = function (e) { 
-                if(e.data.scripts.length > 0)
-                    for(var i in e.data.scripts)
-                        try{ self.importScripts(e.data.scripts[i]);
-                        }catch(p){ console.error(p + " w/ " + e.data.scripts[i]); }
                 return self.postMessage(((eval('(function(func){return func;})(' + (e.data.func) + ')')).apply(null, e.data.args))); 
             }
         }.toString(), 
@@ -51,11 +47,10 @@
             this.workers[dth(pid)] = {
                 worker: new Worker(worker_handler),
                 args: args,
-                scripts: [],
                 init: function (cb) {
                     if (this.worker.onmessage == null)
                         this.worker.onmessage = function (e) { return cb(e.data); }
-                    this.worker.postMessage({ func: (this.func).toString(), args: this.args, scripts: this.scripts });
+                    this.worker.postMessage({ func: (this.func).toString(), args: this.args});
                 },
                 func: func,
             }
@@ -76,15 +71,6 @@
                 return;
             }
             throw new Error("Thread 0x" + pid + " does not exist.");
-        },
-        importScript(pid, script) {
-            pid = dth(pid);
-            if(this.workers[pid] != null)
-                if(typeof(script) === 'object')
-                    for(var i in script)
-                        this.workers[pid].scripts.push(script[i]);
-                else this.workers[pid].scripts.push(script);
-            else throw new Error("Thread 0x" + pid + " does not exist.");	
         },
         execute: function (pid, cb) {
             pid = dth(pid);

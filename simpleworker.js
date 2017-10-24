@@ -48,8 +48,8 @@
                 worker: new Worker(worker_handler),
                 args: args,
                 init: function (cb) {
-                    if (this.worker.onmessage == null)
-                        this.worker.onmessage = function (e) { return cb(e.data); }
+			/* todo, add custom  event handlers, instead of overwriting */
+		    this.worker.onmessage = function (e) { return cb(e.data); }
                     this.worker.postMessage({ func: (this.func).toString(), args: this.args});
                 },
                 func: func,

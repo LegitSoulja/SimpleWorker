@@ -3,7 +3,7 @@
 \| All Rights Reserved
 \| Documentation: https://github.com/LegitSoulja/SimpleWorker
 */
-(function (w, d) {
+(function () {
 
     var worker_handler = w.URL.createObjectURL(new Blob(['(',
       function () {

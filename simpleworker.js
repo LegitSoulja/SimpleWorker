@@ -110,4 +110,7 @@
         }
 
     }
+    
+    this.SimpleWorker = SimpleWorker;
+    
 })(this);

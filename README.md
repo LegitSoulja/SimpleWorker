@@ -29,9 +29,7 @@ var pid = worker.prepare(thread, x, y);
 
 // Execute your work with the pid, along with a callback to recieve the response
 worker.execute(pid, function(e){
-
   console.log(e.length); // 40,000
-  
 }, true); // true keeps the worker open, false is default
 
 
@@ -40,13 +38,11 @@ worker.restore(pid, thread, 500, 500)
 
 
 // Using NULL will not overwrite your thread, but you can update arguments if needed
-// SimpleWorker.restore(pid, null, 500, 500); 
+// worker.restore(pid, null, 500, 500); 
 
 // Re-executing..
 worker.execute(pid, function(e){
-
   console.log(e.length); // 250,000
-  
 }, false); // kill destroy worker, (False is default and is not required if closing)
 
 

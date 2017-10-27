@@ -1,10 +1,7 @@
 /*
-\| LegitSoulja | 2017
+\| LegitSoulja
 \| All Rights Reserved
 \| Documentation: https://github.com/LegitSoulja/SimpleWorker
-\|
-\| License: Apache
-\|
 */
 (function (w, d) {
 

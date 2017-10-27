@@ -111,6 +111,4 @@
 
     }
     
-    this.SimpleWorker = SimpleWorker;
-    
 })(this);

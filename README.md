@@ -1,72 +1,58 @@
 # SimpleWorker
-###### Size: 1.83KB
+###### Size: 1.09KB
 
 Make JavaScript Workers easier, and friendly to use.
 
 ```js
-// SimpleWorker is global in window, but you can create a new instance if needed for security
-// var worker = SimpleWorker.newInstance()
+var worker = new SimpleWorker();
 
-/* global SimpleWorker */
+var x,y;
+x = y =200;
 
-var x = 200;
-var y = 200;
-
-// Your Thread (Function), that is passed to the worker to read
+// Create your thread
 var thread = function(x,y){ 
   
-  var ix, iy, Vector2, map = [];
+  var ix, iy, map = [];
   ix = iy = 0;
-  
-  Vector2 = function(x,y) {
-    this.x = x;
-    this.y = y;
-  }
-  
+
   for(ix = 0; ix < x; ix++)
     for(iy = 0; iy < y; iy++)
-        map.push(new Vector2(ix,iy));
+        map.push({x : ix , y : iy});
         
   return map;
   
 };
 
 
-// Create your worker, with it's thread (Function), along with any agruments you need to pass with
-var pid = SimpleWorker.prepare(thread, x, y);
+// Prepare your thread, along with arguments, -> return (pid) integer
+var pid = worker.prepare(thread, x, y);
 
+// Execute your work with the pid, along with a callback to recieve the response
+worker.execute(pid, function(e){
 
-
-// execute your worker (async), get in return your responce. You MUST use a callback on execute, until another solution is found to properly handle a Promise.
-SimpleWorker.execute(pid, function(e){
   console.log(e.length); // 40,000
-});
+  
+}, true); // true keeps the worker open, false is default
 
 
-// You can even restore a worker without making another. Pass back the thread, and arguments
-SimpleWorker.restore(pid, thread, 500, 500)
+// You can restore a thread after it was prepared if needed
+worker.restore(pid, thread, 500, 500)
 
 
-// Using Null will not overwrite your thread, but you can change arguments if needed aswell
+// Using NULL will not overwrite your thread, but you can update arguments if needed
 // SimpleWorker.restore(pid, null, 500, 500); 
 
+// Re-executing..
+worker.execute(pid, function(e){
 
-SimpleWorker.execute(pid, function(e){
   console.log(e.length); // 250,000
-});
+  
+}, false); // kill destroy worker, (False is default and is not required if closing)
 
 
-// kill/destroy worker
-SimpleWorker.kill(pid);
+// Another worker killing method
+// worker.kill(pid);
 ```
 
 ##### Notes
 - You cannot use SimpleWorker for DOM uses.
-
-##### Todo
-- [ ] More advanced stuff
-- [ ] Implement for/foreach threading, (Basically an implemented function within the worker), 
-> When using for/foreach threading you still use for/foreach in your thread function. It'll just be replaced with a function the Worker can read that'll run for/each in a new thread. **This may or moy not be a feature, but for testing purposes only**.
-
-
-

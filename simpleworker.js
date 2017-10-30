@@ -5,7 +5,7 @@
 */
 (function () {
 
-    var worker_handler = w.URL.createObjectURL(new Blob(['(',
+    var worker_handler = this.URL.createObjectURL(new Blob(['(',
       function () {
             self.onmessage = function (e) {
                 return self.postMessage({

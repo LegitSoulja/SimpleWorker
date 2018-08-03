@@ -1,16 +1,13 @@
-/*
-\| LegitSoulja
-\| All Rights Reserved
-\| Documentation: https://github.com/LegitSoulja/SimpleWorker
-*/
-(function () {
-
-    var worker_handler = this.URL.createObjectURL(new Blob(['(',
+(function(){
+  
+  var $workers = { global: { } };
+  var $scope = 'global';
+  
+  var $handler = this.URL.createObjectURL(new Blob(['(',
       function () {
             self.onmessage = function (e) {
                 return self.postMessage({
-                    index: e.data.index,
-                    data: ((eval('(function(func){return func;})(' + (e.data.func) + ')'))
+                    data: ((eval('(function(a){return a;})(' + (e.data.func) + ')'))
                         .apply(null, e.data.args))
                 });
             }
@@ -18,97 +15,87 @@
   ')()'], {
         type: "application/javascript"
     }));
+    
+  class Helper {
+    
+    static getFuncProperties(a) {
 
-    this.SimpleWorker = class SimpleWorker {
+      if (typeof a != "function")
+        throw new Error("A function is required, but a(n) " + typeof a + " was given");
 
-        constructor() {
-            this.workers = {}
-        }
+      var e = a.toString();
+      var o = -1;
+      var c = -1;
 
-        prepare(func) {
-            var args = [];
-            if (arguments.length > 1)
-                Array.prototype.push.apply(args, arguments);
-            args.shift(); // remove func
-            var pid = (Object.keys(this.workers).length);
+      for (var i = 0; i < e.length; i++) {
+        if (o <= -1 && e.charCodeAt(i) === 40) o = i + 1;
+        if (c <= -1 && e.charCodeAt(i) === 41) {
+          c = i;
+        break;
+        }
+      }
 
-            this.workers[("!" + pid)] = {
-                worker: new Worker(worker_handler),
-                func: func,
-                args: args,
-                loads: [],
-                init: function (cb) {
-                    var len = this.loads.length;
-                    this.loads.push(cb)
-                    var a = this;
-                    this.worker.onmessage = function (e) {
-                        var i = 0;
-                        if (typeof (e) != 'undefined' && typeof (e.data.index) != 'undefined') 
-                            if (typeof (a.loads[e.data.index]) != 'undefined') {
-                                a.loads[e.data.index](e.data.data);
-                                a.loads[e.data.index] = null;
-                            }
-                    }
-                    this.worker.postMessage({func: (this.func).toString(),args: this.args,index: len});
-                },
-                terminate: function () {
-                    this.worker.terminate();
-                }
-            }
-            return pid;
-        }
-        shiftN(args, n) {
-            for (var i = 0; i < n; i++) args.shift();
-            return args;
-        }
-        restore(pid, func) {
-            pid = ("!" + pid);
-            if (typeof (this.workers[pid]) != 'undefined') {
-                if (func != null) this.workers[pid].func = func;
-                var args = [];
-                if (arguments.length > 2) {
-                    Array.prototype.push.apply(args, arguments);
-                    args = this.shiftN(args, 2);
-                    this.workers[pid].args = args;
-                }
-                return;
-            }
-            throw new Error('Unable to find worker with pid ID #' + pid);
-        }
-        execute(pid, cb, persistent = false) {
-            pid = ("!" + pid);
-            var a = this;
-            if (typeof (this.workers[pid]) != 'undefined') {
-                if (typeof (cb) == 'function') this.workers[pid].init(function (e) {
-                    cb(e);
-                    if (!persistent) {
-                        a.workers[pid].terminate();
-                        delete a.workers[pid];
-                    }
-                });
-                else throw new Error('Execute requires a callback function as the second argument.');
-            } else throw new Error('Unable to find worker with pid ID #' + pid);
-        }
-        kill(pid) {
-            pid = ("!" + pid)
-            if (typeof (this.workers[pid]) != 'undefined') {
-                this.workers[pid].terminate();
-                delete this.workers[pid];
-            }
-        }
+      if (c <= -1 || o <= -1) 
+        throw new Error("Failed to obtain function");
+      
+      return {name:e.substr(0, o - 1), args:e.substr(o, c - o).split(","), etc:e.substr(c + 1)};
+  }
+    
+  }
+  
+  class Worker {
+    constructor(job){
+      this.callbacks = [];
+      this.job = job;
+      this.info = Helper.getFuncProperties(job);
 
-        killAll() {
-            var keys = Object.keys(this.workers);
-            for (var i in keys) {
-                this.workers[keys[i]].terminate();
-                delete this.workers[keys[i]];
-            }
-        }
+      this.worker = new window.Worker($handler);
+      
+      this.worker.onmessage = function(e){
 
-        newInstance() {
-            return new SimpleWorker();
+        if(e && e.data) {
+          for(var i = 0; i < this.callbacks.length; i++)
+            this.callbacks[i](e.data);
         }
-
+      }.bind(this);
     }
     
-})(this);
+    execute(args, callback) {
+      if(args.length != this.info.args.length)
+        throw new Error("Job requires " + this.info.args.length + " arguments, but only " + args.length + " was given");
+      this.callbacks.push(callback);
+      this.worker.postMessage({func: this.job.toString(), data: args});
+    }
+  }
+  
+  class SimpleWorker {
+    
+    static setScope(a){
+      if(a.length <= 0) return;
+      if(!Object.hasOwnProperty($workers, a)) {
+        $workers[a] = {}
+      }
+      $scope = a;
+    }
+    
+    static create(name, job){
+      
+      if(name.length <= 0)
+        throw new Error("No name provided for this job.");
+      else if(typeof job != 'function') 
+        throw new Error("Typeof job must be a function.");
+      
+      if(Object.hasOwnProperty($workers[$scope], name)) {
+        throw new Error("Job " + name + " already exist in scope " + $scope);
+      }
+      
+      $workers[$scope][name] = new Worker(job);
+      
+      console.log("Created " + name + " in " + $scope);
+      
+      return $workers[$scope][name];
+      
+    }
+    
+  }
+})();

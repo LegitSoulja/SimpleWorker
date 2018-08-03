@@ -1,6 +1,9 @@
 # SimpleWorker
 ###### Size: 1.09KB
 
+
+[v2](https://github.com/LegitSoulja/SimpleWorker/tree/v2) Branch
+
 Make JavaScript Workers easier, and friendly to use.
 
 ```js
